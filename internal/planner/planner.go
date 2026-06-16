@@ -78,6 +78,7 @@ func Plan(det *types.Detection, preset, domain, ci string) (*types.Plan, error) 
 	generatedFiles := []string{
 		".deploy/docker-compose.yml",
 		".deploy/.env.example",
+		".deploy/.gitignore",
 		".deploy/scripts/deploy.sh",
 		".deploy/scripts/rollback.sh",
 		".deploy/scripts/status.sh",
@@ -91,6 +92,8 @@ func Plan(det *types.Detection, preset, domain, ci string) (*types.Plan, error) 
 
 	if preset == "compose-traefik" {
 		generatedFiles = append(generatedFiles, ".deploy/traefik/dynamic.yml")
+	} else if preset == "compose-nginx" {
+		generatedFiles = append(generatedFiles, ".deploy/nginx/default.conf")
 	}
 
 	if ci == "github" {
@@ -137,6 +140,8 @@ func Plan(det *types.Detection, preset, domain, ci string) (*types.Plan, error) 
 		Domain:         domain,
 		PublicService:  publicService,
 		Runtime:        types.RuntimePlan{Name: det.Runtime.Name, Framework: det.Runtime.Framework, Confidence: det.Runtime.Confidence},
+		Build:          det.Build,
+		Network:        det.Network,
 		Services:       services,
 		Env:            types.EnvPlan{Required: envRequired, Sensitive: envSensitive},
 		GeneratedFiles: generatedFiles,
