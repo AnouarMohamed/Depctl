@@ -1,0 +1,74 @@
+{
+  "version": "0.1",
+  "project": {
+    "name": "node-next",
+    "root": "/home/anouar/Documents/Projects/Depctl/fixtures/node-next",
+    "gitRoot": false
+  },
+  "runtime": {
+    "name": "node",
+    "framework": "nextjs",
+    "confidence": 0.95,
+    "evidence": [
+      {
+        "file": "package.json",
+        "reason": "package.json exists"
+      },
+      {
+        "file": "package.json",
+        "reason": "dependency next detected"
+      },
+      {
+        "file": "pnpm-lock.yaml",
+        "reason": "pnpm lockfile detected"
+      }
+    ]
+  },
+  "build": {
+    "packageManager": "pnpm",
+    "buildCommand": "pnpm run build",
+    "startCommand": "pnpm start"
+  },
+  "network": {
+    "internalPort": 3000,
+    "confidence": 0.8,
+    "evidence": [
+      {
+        "file": "package.json",
+        "reason": "default framework port inferred"
+      }
+    ]
+  },
+  "env": {
+    "keys": null,
+    "sensitive": null,
+    "hasEnvExample": false
+  },
+  "dependencies": {
+    "mysql": {
+      "likely": false,
+      "confidence": 0.1
+    },
+    "postgres": {
+      "likely": false,
+      "confidence": 0.1
+    },
+    "redis": {
+      "likely": false,
+      "confidence": 0.1
+    }
+  },
+  "containerization": {
+    "dockerfilePresent": false,
+    "composePresent": false
+  },
+  "ci": {
+    "githubActions": false,
+    "gitlab": false,
+    "gitea": false
+  },
+  "warnings": [
+    "No .env.example found.",
+    "No Dockerfile found."
+  ]
+}

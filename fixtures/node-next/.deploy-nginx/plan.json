@@ -1,0 +1,72 @@
+{
+  "version": "0.1",
+  "project": {
+    "name": "node-next",
+    "root": "/home/anouar/Documents/Projects/Depctl/fixtures/node-next"
+  },
+  "preset": "compose-nginx",
+  "domain": "nginx.example.com",
+  "publicService": "web",
+  "runtime": {
+    "name": "node",
+    "framework": "nextjs",
+    "confidence": 0.95
+  },
+  "build": {
+    "packageManager": "pnpm",
+    "buildCommand": "pnpm run build",
+    "startCommand": "pnpm start"
+  },
+  "network": {
+    "internalPort": 3000,
+    "confidence": 0.8,
+    "evidence": [
+      {
+        "file": "package.json",
+        "reason": "default framework port inferred"
+      }
+    ]
+  },
+  "services": [
+    {
+      "name": "web",
+      "type": "app",
+      "build": ".",
+      "internalPort": 3000,
+      "public": true
+    }
+  ],
+  "env": {
+    "required": [],
+    "sensitive": []
+  },
+  "generatedFiles": [
+    ".deploy/docker-compose.yml",
+    ".deploy/.env.example",
+    ".deploy/.gitignore",
+    ".deploy/scripts/deploy.sh",
+    ".deploy/scripts/rollback.sh",
+    ".deploy/scripts/status.sh",
+    ".deploy/scripts/backup.sh",
+    ".deploy/README.md",
+    ".deploy/Dockerfile",
+    ".deploy/.dockerignore",
+    ".deploy/nginx/default.conf",
+    ".deploy/ci/github-actions.yml"
+  ],
+  "actions": [
+    {
+      "type": "compose_up",
+      "file": ".deploy/docker-compose.yml"
+    }
+  ],
+  "warnings": [
+    "No .env.example found.",
+    "No Dockerfile found."
+  ],
+  "manualSteps": [
+    "Create DNS A record for nginx.example.com pointing to this VPS.",
+    "Fill real secret values in .env on the VPS.",
+    "Review .deploy/docker-compose.yml before applying."
+  ]
+}
