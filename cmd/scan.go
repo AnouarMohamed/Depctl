@@ -18,18 +18,23 @@ var scanCmd = &cobra.Command{
 	Use:   "scan",
 	Short: "Scan project directory for deployment signals",
 	Long:  `Analyzes the codebase for runtimes, frameworks, environment variables, databases, and container configurations.`,
+	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		output.Step("Starting project scan...")
 
-		// Get current working directory
-		cwd, err := os.Getwd()
+		targetDir := "."
+		if len(args) > 0 {
+			targetDir = args[0]
+		}
+
+		absTargetDir, err := filepath.Abs(targetDir)
 		if err != nil {
-			output.Error("failed to get current working directory: %v", err)
+			output.Error("failed to get absolute path for %s: %v", targetDir, err)
 			os.Exit(1)
 		}
 
 		// Execute Scan
-		det, err := scanner.Scan(cwd)
+		det, err := scanner.Scan(absTargetDir)
 		if err != nil {
 			output.Error("scan failed: %v", err)
 			os.Exit(1)
