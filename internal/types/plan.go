@@ -45,6 +45,8 @@ type Plan struct {
 	Domain         string            `json:"domain"`
 	PublicService  string            `json:"publicService"`
 	Runtime        RuntimePlan       `json:"runtime"`
+	Build          BuildDetection    `json:"build"`
+	Network        NetworkDetection  `json:"network"`
 	Services       []Service         `json:"services"`
 	Env            EnvPlan           `json:"env"`
 	GeneratedFiles []string          `json:"generatedFiles"`
