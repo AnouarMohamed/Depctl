@@ -1,0 +1,53 @@
+# Base image
+FROM node:20-alpine AS base
+
+# Stage 1: Install dependencies
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copy package manifest and lockfiles
+COPY package.json {{if eq .Build.PackageManager "pnpm"}}pnpm-lock.yaml{{else if eq .Build.PackageManager "yarn"}}yarn.lock{{else if eq .Build.PackageManager "bun"}}bun.lockb{{else}}package-lock.json{{end}} ./
+
+# Install packages based on detected package manager
+RUN \
+  if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
+  elif [ -f yarn.lock ]; then yarn install --frozen-lockfile; \
+  elif [ -f bun.lockb ]; then corepack enable bun && bun install --frozen-lockfile; \
+  else npm ci; \
+  fi
+
+# Stage 2: Build the source code
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Run build step
+RUN \
+  if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
+  elif [ -f yarn.lock ]; then yarn build; \
+  elif [ -f bun.lockb ]; then corepack enable bun && bun run build; \
+  else npm run build; \
+  fi
+
+# Stage 3: Production runner
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Copy build artifacts (Next.js standalone configuration is recommended)
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+EXPOSE {{.Network.InternalPort}}
+ENV PORT={{.Network.InternalPort}}
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]
