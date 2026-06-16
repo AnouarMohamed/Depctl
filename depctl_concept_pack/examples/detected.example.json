@@ -1,0 +1,77 @@
+{
+  "version": "0.1",
+  "project": {
+    "name": "example-next-app",
+    "root": "/srv/example-next-app",
+    "gitRoot": true
+  },
+  "runtime": {
+    "name": "node",
+    "framework": "nextjs",
+    "confidence": 0.93,
+    "evidence": [
+      {
+        "file": "package.json",
+        "reason": "package.json exists"
+      },
+      {
+        "file": "package.json",
+        "reason": "dependency next detected"
+      },
+      {
+        "file": "pnpm-lock.yaml",
+        "reason": "pnpm lockfile detected"
+      }
+    ]
+  },
+  "build": {
+    "packageManager": "pnpm",
+    "buildCommand": "pnpm build",
+    "startCommand": "pnpm start"
+  },
+  "network": {
+    "internalPort": 3000,
+    "confidence": 0.82,
+    "evidence": [
+      {
+        "file": "package.json",
+        "reason": "Next.js default port inferred"
+      }
+    ]
+  },
+  "env": {
+    "keys": [
+      "DATABASE_URL",
+      "NEXTAUTH_SECRET",
+      "NEXTAUTH_URL"
+    ],
+    "sensitive": [
+      "NEXTAUTH_SECRET"
+    ],
+    "hasEnvExample": false
+  },
+  "dependencies": {
+    "postgres": {
+      "likely": true,
+      "confidence": 0.72
+    },
+    "redis": {
+      "likely": false,
+      "confidence": 0.2
+    }
+  },
+  "containerization": {
+    "dockerfilePresent": false,
+    "composePresent": false
+  },
+  "ci": {
+    "githubActions": false,
+    "gitlab": false,
+    "gitea": false
+  },
+  "warnings": [
+    "No .env.example found.",
+    "DATABASE_URL referenced but no database service exists.",
+    "No Dockerfile found."
+  ]
+}
