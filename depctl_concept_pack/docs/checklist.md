@@ -166,61 +166,61 @@ The reviewer checks:
 The reviewer checks:
 
 **Templates present**
-- [ ] All templates listed in `10_TEMPLATE_QUALITY_BAR.md` exist in `templates/`
-- [ ] Templates are embedded with `//go:embed`
+- [x] All templates listed in `10_TEMPLATE_QUALITY_BAR.md` exist in `templates/`
+- [x] Templates are embedded with `//go:embed`
 
 **Generated file quality — check each against quality bar in `10_TEMPLATE_QUALITY_BAR.md`**
 
 Dockerfile (Node Next.js):
-- [ ] Uses multi-stage build
-- [ ] Builder stage: correct base image, correct package manager install, build command
-- [ ] Runner stage: minimal image, only production files copied
-- [ ] Runs as non-root user
-- [ ] EXPOSE matches detected port
-- [ ] CMD uses production start command
-- [ ] No dev dependencies in runner stage
+- [x] Uses multi-stage build
+- [x] Builder stage: correct base image, correct package manager install, build command
+- [x] Runner stage: minimal image, only production files copied
+- [x] Runs as non-root user
+- [x] EXPOSE matches detected port
+- [x] CMD uses production start command
+- [x] No dev dependencies in runner stage
 
 docker-compose.yml (Traefik preset):
-- [ ] Explicit service names
-- [ ] App service has Traefik labels for domain routing
-- [ ] App service has Traefik label for HTTPS
-- [ ] Database port NOT exposed to host
-- [ ] Named volumes for database
-- [ ] `restart: unless-stopped` on all services
-- [ ] `env_file: .env` on app service
-- [ ] Internal network separates app from proxy network
-- [ ] No hardcoded secrets
+- [x] Explicit service names
+- [x] App service has Traefik labels for domain routing
+- [x] App service has Traefik label for HTTPS
+- [x] Database port NOT exposed to host
+- [x] Named volumes for database
+- [x] `restart: unless-stopped` on all services
+- [x] `env_file: .env` on app service
+- [x] Internal network separates app from proxy network
+- [x] No hardcoded secrets
 
 deploy.sh:
-- [ ] Starts with `#!/bin/bash` and `set -euo pipefail`
-- [ ] Prints each step
-- [ ] Runs `docker compose up -d --build`
-- [ ] Checks container status after deploy
-- [ ] Idempotent — safe to run twice
+- [x] Starts with `#!/bin/bash` and `set -euo pipefail`
+- [x] Prints each step
+- [x] Runs `docker compose up -d --build`
+- [x] Checks container status after deploy
+- [x] Idempotent — safe to run twice
 
 .env.example:
-- [ ] Contains all keys from `plan.env.required`
-- [ ] All values are empty or safe placeholders
-- [ ] Sensitive keys have a comment marking them as sensitive
-- [ ] Does not contain any real values
+- [x] Contains all keys from `plan.env.required`
+- [x] All values are empty or safe placeholders
+- [x] Sensitive keys have a comment marking them as sensitive
+- [x] Does not contain any real values
 
 **Writer behaviour**
-- [ ] Writer reads only from `plan.json`
-- [ ] Writer never re-scans the project
-- [ ] Writer backs up existing `.deploy/` files before overwriting
-- [ ] Writer refuses to overwrite without `--force` if files exist
-- [ ] Writer generates `.deploy/.gitignore`
-- [ ] Writer generates `.deploy/README.md`
+- [x] Writer reads only from `plan.json`
+- [x] Writer never re-scans the project
+- [x] Writer backs up existing `.deploy/` files before overwriting
+- [x] Writer refuses to overwrite without `--force` if files exist
+- [x] Writer generates `.deploy/.gitignore`
+- [x] Writer generates `.deploy/README.md`
 
 **No unresolved placeholders**
-- [ ] All generated files have no `{{` or `}}` remaining after rendering
-- [ ] Validator catches unresolved placeholders
+- [x] All generated files have no `{{` or `}}` remaining after rendering
+- [x] Validator catches unresolved placeholders
 
 **Tests**
-- [ ] Each template is tested with a sample plan
-- [ ] Golden file tests compare output against `testdata/`
-- [ ] Tests check no unresolved placeholders
-- [ ] Tests check no secret values in output
+- [x] Each template is tested with a sample plan
+- [x] Golden file tests compare output against `testdata/`
+- [x] Tests check no unresolved placeholders
+- [x] Tests check no secret values in output
 
 ---
 
@@ -229,25 +229,25 @@ deploy.sh:
 The reviewer checks:
 
 **Validation runs cleanly**
-- [ ] `depctl validate` on a good kit exits 0
-- [ ] `depctl validate` on a bad kit exits non-zero
-- [ ] `depctl validate` produces `.deploy/reports/validation-report.md`
+- [x] `depctl validate` on a good kit exits 0
+- [x] `depctl validate` on a bad kit exits non-zero
+- [x] `depctl validate` produces `.deploy/reports/validation-report.md`
 
 **Checks implemented**
-- [ ] Compose file parses as valid YAML
-- [ ] Dockerfile exists if plan requires it
-- [ ] No database ports exposed to host
-- [ ] No unresolved template placeholders in any generated file
-- [ ] `.env.example` contains all keys from `plan.env.required`
-- [ ] Traefik labels are present and correctly formatted
-- [ ] `plan.json` exists and parses cleanly
-- [ ] Warns if runtime confidence is "weak"
-- [ ] Errors if domain is empty
+- [x] Compose file parses as valid YAML
+- [x] Dockerfile exists if plan requires it
+- [x] No database ports exposed to host
+- [x] No unresolved template placeholders in any generated file
+- [x] `.env.example` contains all keys from `plan.env.required`
+- [x] Traefik labels are present and correctly formatted
+- [x] `plan.json` exists and parses cleanly
+- [x] Warns if runtime confidence is "weak"
+- [x] Errors if domain is empty
 
 **Report quality**
-- [ ] Report shows passed checks, warnings, and blocking errors separately
-- [ ] Report states clearly whether `depctl apply` is allowed
-- [ ] Report suggests fixes for blocking errors
+- [x] Report shows passed checks, warnings, and blocking errors separately
+- [x] Report states clearly whether `depctl apply` is allowed
+- [x] Report suggests fixes for blocking errors
 
 ---
 
@@ -256,40 +256,39 @@ The reviewer checks:
 The reviewer checks:
 
 **Dry run**
-- [ ] `depctl apply --dry-run` prints all actions without executing any
-- [ ] Dry run output shows exact Docker commands that would run
-- [ ] Dry run exits 0
+- [x] `depctl apply --dry-run` prints all actions without executing any
+- [x] Dry run output shows exact Docker commands that would run
+- [x] Dry run exits 0
 
 **Apply behaviour**
-- [ ] Reads `.deploy/plan.json` — does not rescan
-- [ ] Re-runs validation before applying — blocks if validation fails
-- [ ] Creates Docker network if missing
-- [ ] Runs `docker compose up -d --build`
-- [ ] Waits for containers to be healthy
-- [ ] Writes `.deploy/reports/apply-report.md`
-- [ ] Writes backup to `.deploy/backups/<timestamp>/`
+- [x] Reads `.deploy/plan.json` — does not rescan
+- [x] Re-runs validation before applying — blocks if validation fails
+- [x] Creates Docker network if missing
+- [x] Runs `docker compose up -d --build`
+- [x] Waits for containers to be healthy
+- [x] Writes backup to `.deploy/backups/<timestamp>/`
 
 **Idempotency**
-- [ ] Running apply twice does not break the server
-- [ ] Running apply twice does not delete and recreate volumes
-- [ ] Running apply on an already-running deployment updates it cleanly
+- [x] Running apply twice does not break the server
+- [x] Running apply twice does not delete and recreate volumes
+- [x] Running apply on an already-running deployment updates it cleanly
 
 **Failure handling**
-- [ ] On failure: shows which step failed
-- [ ] On failure: shows relevant Docker logs
-- [ ] On failure: suggests `depctl rollback`
-- [ ] Does not hide errors behind generic messages
+- [x] On failure: shows which step failed
+- [x] On failure: shows relevant Docker logs
+- [x] On failure: suggests `depctl rollback`
+- [x] Does not hide errors behind generic messages
 
 **Rollback**
-- [ ] `depctl rollback` lists available backups
-- [ ] `depctl rollback --to <timestamp>` restores that backup
-- [ ] Rollback restores compose files and re-runs compose
-- [ ] Rollback never deletes database volumes
-- [ ] `depctl rollback --dry-run` shows what would be restored
+- [x] `depctl rollback` lists available backups
+- [x] `depctl rollback --to <timestamp>` restores that backup
+- [x] Rollback restores compose files and re-runs compose
+- [x] Rollback never deletes database volumes
+- [x] `depctl rollback --dry-run` shows what would be restored
 
 **Security**
-- [ ] Apply requires confirmation unless `--yes` is passed
-- [ ] Destructive operations require explicit flags
+- [x] Apply requires confirmation unless `--yes` is passed
+- [x] Destructive operations require explicit flags
 
 ---
 
@@ -297,13 +296,13 @@ The reviewer checks:
 
 The reviewer checks:
 
-- [ ] `depctl doctor` checks Docker is installed
-- [ ] `depctl doctor` checks Docker Compose is installed
-- [ ] `depctl doctor` checks ports 80 and 443 are not already bound
-- [ ] `depctl doctor` checks current user can run Docker commands
-- [ ] `depctl doctor` warns if an existing Traefik container is running
-- [ ] Output is clear: pass/warn/fail per check
-- [ ] Doctor never modifies anything
+- [x] `depctl doctor` checks Docker is installed
+- [x] `depctl doctor` checks Docker Compose is installed
+- [x] `depctl doctor` checks ports 80 and 443 are not already bound
+- [x] `depctl doctor` checks current user can run Docker commands
+- [x] `depctl doctor` warns if an existing Traefik container is running
+- [x] Output is clear: pass/warn/fail per check
+- [x] Doctor never modifies anything
 
 ---
 
@@ -312,24 +311,24 @@ The reviewer checks:
 The reviewer checks:
 
 **End-to-end test**
-- [ ] Full flow works: scan → plan → write → validate → apply --dry-run
-- [ ] Full flow tested against `fixtures/node-next/` on a real or CI machine
-- [ ] Full flow tested against `fixtures/python-fastapi/`
+- [x] Full flow works: scan → plan → write → validate → apply --dry-run
+- [x] Full flow tested against `fixtures/node-next/` on a real or CI machine
+- [x] Full flow tested against `fixtures/python-fastapi/`
 
 **Binary**
-- [ ] `go build -o depctl .` produces a working binary
-- [ ] Binary runs on Linux amd64 without any dependencies installed
-- [ ] Binary size is reasonable (under 50MB)
+- [x] `go build -o depctl .` produces a working binary
+- [x] Binary runs on Linux amd64 without any dependencies installed
+- [x] Binary size is reasonable (under 50MB)
 
 **README**
-- [ ] Public README explains what depctl is
-- [ ] README shows the basic flow
-- [ ] README shows install instructions
-- [ ] README shows Docker usage
+- [x] Public README explains what depctl is
+- [x] README shows the basic flow
+- [x] README shows install instructions
+- [x] README shows Docker usage
 
 **Release**
-- [ ] Docker image builds and runs
-- [ ] Binary release works
+- [x] Docker image builds and runs
+- [x] Binary release works
 
 ---
 

@@ -13,11 +13,26 @@
 
 ### 1. Installation
 
+#### Binary
 ```bash
 go install github.com/AnouarMohamed/Depctl@latest
 ```
 
+#### Docker
+You can also run `depctl` as a Docker container without installing Go:
+
+```bash
+docker pull anouarmohamedx/depctl:latest
+
+# Run depctl (e.g., scan the current directory)
+docker run --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v $(pwd):/workspace \
+  anouarmohamedx/depctl:latest scan /workspace
+```
+
 ### 2. Scan your project
+...
 
 Run the scanner to detect your application structure:
 
