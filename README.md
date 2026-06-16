@@ -51,7 +51,3 @@ depctl apply
 ## Documentation
 
 For deep dives into the architecture and design principles, see the [Concept Pack](./depctl_concept_pack/README.md).
-
-## License
-
-MIT (or your preferred license)
