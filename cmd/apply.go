@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
+	"depctl/internal/engine"
 	"depctl/internal/output"
 )
 
@@ -10,6 +13,7 @@ var (
 	applyDryRun          bool
 	applySkipBuild       bool
 	applySkipHealthcheck bool
+	applyOutputDir       string
 )
 
 var applyCmd = &cobra.Command{
@@ -17,11 +21,18 @@ var applyCmd = &cobra.Command{
 	Short: "Apply deployment plan",
 	Long:  `Executes the deployment actions outlined in the saved plan.json, backing up the current state first.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		output.Info("Running depctl apply skeleton...")
-		output.Step("Skip Confirmation (--yes): %v", applyYes)
-		output.Step("Dry Run: %v", applyDryRun)
-		output.Step("Skip Build: %v", applySkipBuild)
-		output.Step("Skip Healthcheck: %v", applySkipHealthcheck)
+		opts := engine.ApplyOptions{
+			OutputDir:       applyOutputDir,
+			Yes:             applyYes,
+			DryRun:          applyDryRun,
+			SkipBuild:       applySkipBuild,
+			SkipHealthcheck: applySkipHealthcheck,
+		}
+
+		if err := engine.Apply(opts); err != nil {
+			output.Error("Apply failed: %v", err)
+			os.Exit(1)
+		}
 	},
 }
 
@@ -30,6 +41,7 @@ func init() {
 	applyCmd.Flags().BoolVar(&applyDryRun, "dry-run", false, "display execution steps without running them")
 	applyCmd.Flags().BoolVar(&applySkipBuild, "skip-build", false, "skip building new Docker images")
 	applyCmd.Flags().BoolVar(&applySkipHealthcheck, "skip-healthcheck", false, "skip post-deployment health check checks")
+	applyCmd.Flags().StringVar(&applyOutputDir, "output-dir", ".deploy", "directory containing deployment files to apply")
 
 	rootCmd.AddCommand(applyCmd)
 }
