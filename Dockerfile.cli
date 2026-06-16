@@ -1,0 +1,32 @@
+# Use a lightweight Go image to build the binary
+FROM golang:1.22-alpine AS builder
+
+# Install git for module fetching
+RUN apk add --no-cache git
+
+WORKDIR /app
+
+# Copy go mod and sum files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy the rest of the source code
+COPY . .
+
+# Build the binary
+RUN CGO_ENABLED=0 GOOS=linux go build -o /depctl .
+
+# Use a minimal alpine image for the final runner
+FROM alpine:3.19
+
+# Install docker and docker-compose for the tool to interact with host
+RUN apk add --no-cache docker-cli docker-cli-compose
+
+# Copy the binary from the builder
+COPY --from=builder /depctl /usr/local/bin/depctl
+
+# Set working directory
+WORKDIR /workspace
+
+# Run depctl
+ENTRYPOINT ["depctl"]
