@@ -28,3 +28,5 @@ jobs:
           tags: |
             anouarmohamedx/depctl:latest
             anouarmohamedx/depctl:${{ github.ref_name }}
+            ghcr.io/anouarmohamedx/depctl:latest
+            ghcr.io/anouarmohamedx/depctl:${{ github.ref_name }}
