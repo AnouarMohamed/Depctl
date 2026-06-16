@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"depctl/internal/output"
+	"depctl/internal/doctor"
 )
 
 var doctorCmd = &cobra.Command{
@@ -10,7 +10,7 @@ var doctorCmd = &cobra.Command{
 	Short: "Check host environment readiness",
 	Long:  `Checks OS compatibility, Docker and Compose installation, permissions, and available ports.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		output.Info("Running depctl doctor skeleton...")
+		doctor.Check()
 	},
 }
 
