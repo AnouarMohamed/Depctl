@@ -3,7 +3,7 @@ package planner
 import (
 	"testing"
 
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 func TestPlanGeneration(t *testing.T) {

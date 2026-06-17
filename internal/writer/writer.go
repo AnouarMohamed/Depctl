@@ -9,8 +9,8 @@ import (
 	"text/template"
 	"time"
 
-	"depctl/internal/types"
-	"depctl/templates"
+	"github.com/AnouarMohamed/Depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/templates"
 )
 
 // Write generates the deployment kit files based on the provided plan.

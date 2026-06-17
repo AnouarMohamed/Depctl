@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"depctl/internal/planner"
-	"depctl/internal/scanner"
-	"depctl/internal/writer"
+	"github.com/AnouarMohamed/Depctl/internal/planner"
+	"github.com/AnouarMohamed/Depctl/internal/scanner"
+	"github.com/AnouarMohamed/Depctl/internal/writer"
 )
 
 func TestGoldenFlows(t *testing.T) {

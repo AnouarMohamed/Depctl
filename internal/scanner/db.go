@@ -3,7 +3,7 @@ package scanner
 import (
 	"strings"
 
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 func detectDependencies(dir string, envKeys []string, runtime types.RuntimeDetection) map[string]types.Dependency {

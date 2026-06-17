@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"depctl/internal/engine"
-	"depctl/internal/output"
+	"github.com/AnouarMohamed/Depctl/internal/engine"
+	"github.com/AnouarMohamed/Depctl/internal/output"
 )
 
 var (

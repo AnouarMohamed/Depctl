@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"depctl/internal/output"
-	"depctl/internal/types"
-	"depctl/internal/validator"
+	"github.com/AnouarMohamed/Depctl/internal/output"
+	"github.com/AnouarMohamed/Depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/validator"
 )
 
 // ApplyOptions holds flags and settings for the apply operation.

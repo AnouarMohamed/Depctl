@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 // Scan analyzes the given directory and returns a structural representation of all detected signals.

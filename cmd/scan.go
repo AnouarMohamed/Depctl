@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
-	"depctl/internal/output"
-	"depctl/internal/scanner"
+	"github.com/AnouarMohamed/Depctl/internal/output"
+	"github.com/AnouarMohamed/Depctl/internal/scanner"
 )
 
 var (

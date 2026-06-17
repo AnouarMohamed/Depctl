@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 // Plan converts a project scan detection into a structured deployment blueprint.

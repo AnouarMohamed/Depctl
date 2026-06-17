@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"depctl/internal/doctor"
+	"github.com/AnouarMohamed/Depctl/internal/doctor"
 )
 
 var doctorCmd = &cobra.Command{

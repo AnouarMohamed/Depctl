@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 // ConfidenceBand maps a float64 confidence score to a string representation.

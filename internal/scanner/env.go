@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 var sensitivePatterns = []string{

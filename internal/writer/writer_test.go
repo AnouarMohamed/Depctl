@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 func TestWrite(t *testing.T) {

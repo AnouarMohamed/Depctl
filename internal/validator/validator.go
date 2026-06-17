@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 	"gopkg.in/yaml.v3"
 )
 

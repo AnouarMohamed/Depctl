@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"depctl/internal/output"
+	"github.com/AnouarMohamed/Depctl/internal/output"
 )
 
 // Check performs a series of system checks and reports findings.

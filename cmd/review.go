@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
-	"depctl/internal/output"
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/output"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 var reviewOutputDir string

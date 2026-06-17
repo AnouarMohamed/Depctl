@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 func scanGoProject(dir string) (types.RuntimeDetection, types.BuildDetection, types.NetworkDetection, bool) {

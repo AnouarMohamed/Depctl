@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
-	"depctl/internal/output"
-	"depctl/internal/planner"
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/output"
+	"github.com/AnouarMohamed/Depctl/internal/planner"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 var (

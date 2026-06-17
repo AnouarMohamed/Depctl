@@ -1,4 +1,4 @@
-module depctl
+module github.com/AnouarMohamed/Depctl
 
 go 1.25.10
 

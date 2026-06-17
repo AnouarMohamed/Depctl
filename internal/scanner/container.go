@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 func scanContainerization(dir string) types.ContainerizationDetection {

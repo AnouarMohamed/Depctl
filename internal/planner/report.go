@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 // GeneratePlanReport creates a markdown report detailing the compiled deployment plan.

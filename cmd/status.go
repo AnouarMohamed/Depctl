@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
-	"depctl/internal/output"
+	"github.com/AnouarMohamed/Depctl/internal/output"
 )
 
 var statusOutputDir string

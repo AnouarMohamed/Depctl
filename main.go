@@ -1,6 +1,6 @@
 package main
 
-import "depctl/cmd"
+import "github.com/AnouarMohamed/Depctl/cmd"
 
 func main() {
 	cmd.Execute()

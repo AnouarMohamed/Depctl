@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"depctl/internal/types"
+	"github.com/AnouarMohamed/Depctl/internal/types"
 )
 
 type pkgJSON struct {

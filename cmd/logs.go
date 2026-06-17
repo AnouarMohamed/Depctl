@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"depctl/internal/output"
+	"github.com/AnouarMohamed/Depctl/internal/output"
 )
 
 var logsCmd = &cobra.Command{
