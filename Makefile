@@ -36,7 +36,7 @@ race:
 
 build:
 	mkdir -p "$(BUILD_DIR)"
-	CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o "$(BUILD_DIR)/$(BINARY)" .
+	CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o "$(BUILD_DIR)/$(BINARY)" ./cmd/depctl
 
 smoke:
 	bash scripts/smoke.sh

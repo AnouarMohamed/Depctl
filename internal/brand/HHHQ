@@ -1,0 +1,17 @@
+     ____             __       __
+    / __ \___  ____  / /______/ /_
+   / / / / _ \/ __ \/ __/ ___/ __/
+  / /_/ /  __/ /_/ / /_/ /__/ /_
+ /_____/\___/ .___/\__/\___/\__/
+            /_/
+
+ by Anouar Mohamed
+
+ START
+   depctl setup --domain app.example.com
+   depctl deploy --target fly --domain app.io
+   depctl deploy --target vercel
+
+ CHECK
+   depctl doctor
+   depctl --help
