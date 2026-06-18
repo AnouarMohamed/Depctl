@@ -60,6 +60,9 @@ func (flyProvider) Apply(plan *types.Plan, opts ApplyOptions) error {
 
 	token := os.Getenv("FLY_ACCESS_TOKEN")
 	redact := []string{token}
+	if err := ensureFlyAuth(token, opts.DryRun, redact); err != nil {
+		return err
+	}
 	app := plan.Target.AppName
 	if app == "" {
 		app = plan.Project.Name
@@ -130,12 +133,18 @@ func (flyProvider) Apply(plan *types.Plan, opts ApplyOptions) error {
 
 func (flyProvider) Status(plan *types.Plan, opts StatusOptions) error {
 	token := os.Getenv("FLY_ACCESS_TOKEN")
+	if err := ensureFlyAuth(token, false, []string{token}); err != nil {
+		return err
+	}
 	_, err := runCommand(commandSpec{Name: "fly", Args: flyArgs(token, "status", "-a", plan.Target.AppName), Cwd: rootDir(plan), RedactValues: []string{token}}, false)
 	return err
 }
 
 func (flyProvider) Logs(plan *types.Plan, opts LogsOptions) error {
 	token := os.Getenv("FLY_ACCESS_TOKEN")
+	if err := ensureFlyAuth(token, false, []string{token}); err != nil {
+		return err
+	}
 	args := flyArgs(token, "logs", "-a", plan.Target.AppName)
 	if opts.Tail > 0 {
 		args = append(args, "--tail", fmt.Sprintf("%d", opts.Tail))
@@ -146,6 +155,9 @@ func (flyProvider) Logs(plan *types.Plan, opts LogsOptions) error {
 
 func (flyProvider) Rollback(plan *types.Plan, opts RollbackOptions) error {
 	token := os.Getenv("FLY_ACCESS_TOKEN")
+	if err := ensureFlyAuth(token, opts.DryRun, []string{token}); err != nil {
+		return err
+	}
 	app := plan.Target.AppName
 	image := opts.To
 	if image == "" {
@@ -170,6 +182,30 @@ func flyArgs(token string, args ...string) []string {
 		return args
 	}
 	return append([]string{"-t", token}, args...)
+}
+
+func ensureFlyAuth(token string, dryRun bool, redact []string) error {
+	if token != "" {
+		return nil
+	}
+	if dryRun {
+		output.Info("[DRY RUN] Would check Fly login and run 'fly auth login' if needed")
+		return nil
+	}
+	if !commandExists("fly") {
+		return fmt.Errorf("fly CLI is not installed or not in PATH")
+	}
+
+	if _, err := runCommand(commandSpec{Name: "fly", Args: []string{"auth", "whoami"}, RedactValues: redact, AllowFailure: true}, false); err == nil {
+		return nil
+	}
+	if !hasInteractiveTerminal() {
+		return fmt.Errorf("fly is not logged in; run 'fly auth login' locally or set FLY_ACCESS_TOKEN for CI")
+	}
+
+	output.Step("Opening Fly login...")
+	_, err := runCommand(commandSpec{Name: "fly", Args: []string{"auth", "login"}, Interactive: true}, false)
+	return err
 }
 
 func pathJoinRoot(plan *types.Plan, path string) string {

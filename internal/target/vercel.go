@@ -64,6 +64,9 @@ func (vercelProvider) Apply(plan *types.Plan, opts ApplyOptions) error {
 	token := os.Getenv("VERCEL_TOKEN")
 	redact := []string{token}
 	global := vercelGlobalArgs(token)
+	if err := ensureVercelAuth(token, opts.DryRun, redact); err != nil {
+		return err
+	}
 
 	output.Step("Linking Vercel project...")
 	_, _ = runCommand(commandSpec{Name: "vercel", Args: append([]string{"link", "--yes"}, global...), Cwd: rootDir(plan), RedactValues: redact, AllowFailure: true}, opts.DryRun)
@@ -113,6 +116,9 @@ func (vercelProvider) Apply(plan *types.Plan, opts ApplyOptions) error {
 
 func (vercelProvider) Status(plan *types.Plan, opts StatusOptions) error {
 	token := os.Getenv("VERCEL_TOKEN")
+	if err := ensureVercelAuth(token, false, []string{token}); err != nil {
+		return err
+	}
 	args := append([]string{"ls"}, vercelGlobalArgs(token)...)
 	_, err := runCommand(commandSpec{Name: "vercel", Args: args, Cwd: rootDir(plan), RedactValues: []string{token}}, false)
 	return err
@@ -125,6 +131,9 @@ func (vercelProvider) Logs(plan *types.Plan, opts LogsOptions) error {
 		return fmt.Errorf("no Vercel deployment URL recorded; run depctl apply first")
 	}
 	token := os.Getenv("VERCEL_TOKEN")
+	if err := ensureVercelAuth(token, false, []string{token}); err != nil {
+		return err
+	}
 	args := append([]string{"logs", state.DeploymentURL}, vercelGlobalArgs(token)...)
 	_, err := runCommand(commandSpec{Name: "vercel", Args: args, Cwd: rootDir(plan), RedactValues: []string{token}}, false)
 	return err
@@ -136,8 +145,35 @@ func (vercelProvider) Rollback(plan *types.Plan, opts RollbackOptions) error {
 		return fmt.Errorf("provide --to with a Vercel deployment id or URL")
 	}
 	token := os.Getenv("VERCEL_TOKEN")
+	if err := ensureVercelAuth(token, opts.DryRun, []string{token}); err != nil {
+		return err
+	}
 	args := append([]string{"rollback", target}, vercelGlobalArgs(token)...)
 	_, err := runCommand(commandSpec{Name: "vercel", Args: args, Cwd: rootDir(plan), RedactValues: []string{token}}, opts.DryRun)
+	return err
+}
+
+func ensureVercelAuth(token string, dryRun bool, redact []string) error {
+	if token != "" {
+		return nil
+	}
+	if dryRun {
+		output.Info("[DRY RUN] Would check Vercel login and run 'vercel login' if needed")
+		return nil
+	}
+	if !commandExists("vercel") {
+		return fmt.Errorf("vercel CLI is not installed or not in PATH")
+	}
+
+	if _, err := runCommand(commandSpec{Name: "vercel", Args: []string{"whoami"}, RedactValues: redact, AllowFailure: true}, false); err == nil {
+		return nil
+	}
+	if !hasInteractiveTerminal() {
+		return fmt.Errorf("vercel is not logged in; run 'vercel login' locally or set VERCEL_TOKEN for CI")
+	}
+
+	output.Step("Opening Vercel login...")
+	_, err := runCommand(commandSpec{Name: "vercel", Args: []string{"login"}, Interactive: true}, false)
 	return err
 }
 

@@ -24,6 +24,8 @@ From a cloned repo:
 ./install.sh
 ```
 
+The local installer prints the Depctl banner after a successful build. Interactive CLI runs show the same banner by default. Use `--no-banner`, `--quiet`, or `DEPCTL_NO_BANNER=1` for scripts.
+
 ## Fast Start
 
 Prepare a VPS deployment kit without deploying:
@@ -110,7 +112,7 @@ depctl deploy --domain app.example.com
 
 ### Fly.io
 
-Requires `flyctl` and either an existing CLI login or `FLY_ACCESS_TOKEN`.
+Requires `flyctl`. For local use, Depctl uses your existing Fly login or starts `fly auth login` when needed. Use `FLY_ACCESS_TOKEN` only for CI or non-interactive deploys.
 
 ```bash
 depctl deploy --target fly --domain app.example.com
@@ -118,7 +120,7 @@ depctl deploy --target fly --domain app.example.com
 
 ### Vercel
 
-Best for Next.js and Vite/static apps. Requires Vercel CLI and either an existing CLI login or `VERCEL_TOKEN`.
+Best for Next.js and Vite/static apps. Requires Vercel CLI. For local use, Depctl uses your existing Vercel login or starts `vercel login` when needed. Use `VERCEL_TOKEN` only for CI or non-interactive deploys.
 
 ```bash
 depctl deploy --target vercel
