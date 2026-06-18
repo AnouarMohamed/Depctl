@@ -10,6 +10,7 @@ This checklist defines what must be true before a release is called production-r
 - Generated provider files are backed up before overwrite.
 - Secret values from `.env` do not appear in `plan.json`, reports, or command logs.
 - Release tags publish binaries and container images.
+- Release tags are created through `make release VERSION=vX.Y.Z`.
 
 ## Manual E2E Gates
 
