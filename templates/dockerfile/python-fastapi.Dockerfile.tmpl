@@ -1,29 +1,21 @@
-# Stage 1: Build & Install deps
-FROM python:3.11-alpine AS builder
+FROM python:3.12-slim
 
 WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PORT={{.Network.InternalPort}}
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends build-essential curl \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN apk add --no-cache gcc musl-dev libffi-dev
-
-COPY requirements.txt ./
-RUN pip install --no-cache-dir --user -r requirements.txt
-
-# Stage 2: Final runner
-FROM python:3.11-alpine AS runner
-
-WORKDIR /app
-
-# Copy dependencies from builder
-COPY --from=builder /root/.local /root/.local
 COPY . .
+RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; \
+  elif [ -f pyproject.toml ]; then pip install --no-cache-dir .; fi
 
-ENV PATH=/root/.local/bin:$PATH
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+RUN useradd --create-home --shell /usr/sbin/nologin app && chown -R app:app /app
+USER app
 
 EXPOSE {{.Network.InternalPort}}
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "{{.Network.InternalPort}}"]
+CMD ["sh", "-c", "{{.Build.StartCommand}}"]

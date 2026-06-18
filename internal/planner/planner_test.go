@@ -87,3 +87,38 @@ func TestPlanGeneration(t *testing.T) {
 		}
 	})
 }
+
+func TestProviderPlanGeneration(t *testing.T) {
+	det := &types.Detection{
+		Project: types.ProjectDetection{Name: "my-next-app", Root: "/srv/my-next-app"},
+		Runtime: types.RuntimeDetection{Name: "node", Framework: "nextjs", Confidence: 0.95},
+		Build:   types.BuildDetection{PackageManager: "npm", BuildCommand: "npm run build", StartCommand: "npm start"},
+		Network: types.NetworkDetection{InternalPort: 3000, Confidence: 0.8},
+		Env:     types.EnvDetection{Keys: []string{"DATABASE_URL", "NEXT_PUBLIC_API_URL"}, Sensitive: []string{"DATABASE_URL"}},
+		Dependencies: map[string]types.Dependency{
+			"postgres": {Likely: false},
+			"redis":    {Likely: false},
+		},
+	}
+
+	plan, err := PlanWithOptions(det, Options{
+		Target:    "vercel",
+		OutputDir: ".deploy",
+		EnvFile:   ".env",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if plan.Target.Kind != "vercel" {
+		t.Fatalf("target: got %q", plan.Target.Kind)
+	}
+	if len(plan.SecretImports) != 1 {
+		t.Fatalf("expected one secret import, got %d", len(plan.SecretImports))
+	}
+	if len(plan.Artifacts) == 0 || plan.Artifacts[0].Path != "vercel.json" {
+		t.Fatalf("expected vercel.json artifact, got %+v", plan.Artifacts)
+	}
+	if plan.Version != "0.2" {
+		t.Fatalf("version: got %q", plan.Version)
+	}
+}

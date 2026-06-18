@@ -10,14 +10,14 @@ func TestScannerFixtures(t *testing.T) {
 	fixturesDir := filepath.Join("..", "..", "fixtures")
 
 	tests := []struct {
-		name                 string
-		fixturePath          string
-		expectedRuntime      string
-		expectedFramework    string
-		expectedPkgManager   string
-		expectedPort         int
-		expectedDockerfile   bool
-		expectedCompose      bool
+		name               string
+		fixturePath        string
+		expectedRuntime    string
+		expectedFramework  string
+		expectedPkgManager string
+		expectedPort       int
+		expectedDockerfile bool
+		expectedCompose    bool
 	}{
 		{
 			name:               "Node Express",
@@ -74,10 +74,10 @@ func TestScannerFixtures(t *testing.T) {
 			expectedDockerfile: true,
 		},
 		{
-			name:               "Existing Compose",
-			fixturePath:        "existing-compose",
-			expectedRuntime:    "node",
-			expectedCompose:    true,
+			name:            "Existing Compose",
+			fixturePath:     "existing-compose",
+			expectedRuntime: "node",
+			expectedCompose: true,
 		},
 	}
 

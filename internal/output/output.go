@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	mu    sync.Mutex
-	quiet bool
-	out   io.Writer = os.Stdout
+	mu     sync.Mutex
+	quiet  bool
+	out    io.Writer = os.Stdout
 	errOut io.Writer = os.Stderr
 )
 

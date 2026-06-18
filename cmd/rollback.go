@@ -3,9 +3,9 @@ package cmd
 import (
 	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/AnouarMohamed/Depctl/internal/engine"
 	"github.com/AnouarMohamed/Depctl/internal/output"
+	"github.com/spf13/cobra"
 )
 
 var (

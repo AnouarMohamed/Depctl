@@ -7,20 +7,26 @@ services:
   {{.Name}}:
     {{if eq .Type "app"}}
     build:
-      context: {{.Build}}
+      context: ..
       dockerfile: Dockerfile
     restart: unless-stopped
     networks:
       - app_net
     env_file:
-      - .env
+      - ../.env
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:{{.InternalPort}}/ || curl -fsS http://127.0.0.1:{{.InternalPort}}/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     {{else if eq .Type "database"}}
     image: {{.Image}}
     restart: unless-stopped
     networks:
       - app_net
     env_file:
-      - .env
+      - ../.env
     {{if .Volume}}
     {{if eq .Name "postgres"}}
     volumes:
@@ -44,7 +50,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./.deploy/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - certs:/etc/nginx/certs:ro
     networks:
       - app_net

@@ -27,7 +27,7 @@ func TestGoldenFlows(t *testing.T) {
 		for _, preset := range presets {
 			t.Run(fixture.Name()+"/"+preset, func(t *testing.T) {
 				fixturePath, _ := filepath.Abs(filepath.Join(fixturesDir, fixture.Name()))
-				
+
 				// 1. Scan
 				det, err := scanner.Scan(fixturePath)
 				if err != nil {
@@ -39,7 +39,7 @@ func TestGoldenFlows(t *testing.T) {
 				if err != nil {
 					t.Fatalf("Plan failed: %v", err)
 				}
-				
+
 				// Ensure plan.json is in the list for the writer to pick it up
 				plan.GeneratedFiles = append(plan.GeneratedFiles, ".deploy/plan.json")
 
@@ -62,7 +62,7 @@ func TestGoldenFlows(t *testing.T) {
 						t.Errorf("expected file %s missing for %s/%s", f, fixture.Name(), preset)
 					}
 				}
-				
+
 				if preset == "compose-traefik" {
 					if _, err := os.Stat(filepath.Join(tempOutputDir, "traefik", "dynamic.yml")); os.IsNotExist(err) {
 						t.Errorf("traefik/dynamic.yml missing")

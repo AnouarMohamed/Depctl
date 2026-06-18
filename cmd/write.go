@@ -1,15 +1,12 @@
 package cmd
 
 import (
-	"encoding/json"
 	"os"
-	"path/filepath"
-
-	"github.com/spf13/cobra"
 
 	"github.com/AnouarMohamed/Depctl/internal/output"
-	"github.com/AnouarMohamed/Depctl/internal/types"
-	"github.com/AnouarMohamed/Depctl/internal/writer"
+	"github.com/AnouarMohamed/Depctl/internal/planfile"
+	"github.com/AnouarMohamed/Depctl/internal/target"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -24,21 +21,19 @@ var writeCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		output.Step("Loading plan from %s/plan.json...", writeOutputDir)
 
-		planPath := filepath.Join(writeOutputDir, "plan.json")
-		planBytes, err := os.ReadFile(planPath)
+		plan, err := planfile.Load(writeOutputDir)
 		if err != nil {
-			output.Error("Failed to read plan file: %v. Run 'depctl plan' first.", err)
+			output.Error("Failed to load plan file: %v. Run 'depctl plan' first.", err)
 			os.Exit(1)
 		}
-
-		var plan types.Plan
-		if err := json.Unmarshal(planBytes, &plan); err != nil {
-			output.Error("Failed to parse plan file: %v", err)
+		provider, err := target.Get(plan.Target.Kind)
+		if err != nil {
+			output.Error("Failed to resolve target provider: %v", err)
 			os.Exit(1)
 		}
 
 		output.Step("Generating deployment kit in %s...", writeOutputDir)
-		if err := writer.Write(&plan, writeOutputDir, writeForce); err != nil {
+		if err := provider.Write(plan, target.WriteOptions{OutputDir: writeOutputDir, Force: writeForce}); err != nil {
 			output.Error("Failed to write deployment kit: %v", err)
 			os.Exit(1)
 		}

@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/cobra"
 	"github.com/AnouarMohamed/Depctl/internal/output"
 	"github.com/AnouarMohamed/Depctl/internal/scanner"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -80,4 +80,3 @@ func init() {
 	scanCmd.Flags().StringVar(&scanOutputDir, "output-dir", ".deploy", "directory where scan results are saved")
 	rootCmd.AddCommand(scanCmd)
 }
-
