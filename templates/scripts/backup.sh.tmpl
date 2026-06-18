@@ -21,10 +21,23 @@ fi
 {{range .Services}}
 {{if eq .Type "database"}}
 echo "🗄️ Dumping {{.Name}}..."
-{{if eq .Name "postgres"}}
-docker compose -f .deploy/docker-compose.yml exec -T {{.Name}} pg_dumpall -U postgres > "$BACKUP_DIR/{{.Name}}_dump.sql"
-{{else if eq .Name "mysql"}}
-docker compose -f .deploy/docker-compose.yml exec -T {{.Name}} mysqldump --all-databases -u root -p"$MYSQL_ROOT_PASSWORD" > "$BACKUP_DIR/{{.Name}}_dump.sql"
+{{if eq $.Preset "swarm-traefik"}}
+CONTAINER_ID=$(docker ps -q -f name={{$.Project.Name}}_{{.Name}} | head -n 1)
+if [ -n "$CONTAINER_ID" ]; then
+  {{if eq .Name "postgres"}}
+  docker exec -T "$CONTAINER_ID" pg_dumpall -U postgres > "$BACKUP_DIR/{{.Name}}_dump.sql"
+  {{else if eq .Name "mysql"}}
+  docker exec -T "$CONTAINER_ID" mysqldump --all-databases -u root -p"$MYSQL_ROOT_PASSWORD" > "$BACKUP_DIR/{{.Name}}_dump.sql"
+  {{end}}
+else
+  echo "⚠️ Database container for {{.Name}} not found on this node; backup skipped."
+fi
+{{else}}
+  {{if eq .Name "postgres"}}
+  docker compose -f .deploy/docker-compose.yml exec -T {{.Name}} pg_dumpall -U postgres > "$BACKUP_DIR/{{.Name}}_dump.sql"
+  {{else if eq .Name "mysql"}}
+  docker compose -f .deploy/docker-compose.yml exec -T {{.Name}} mysqldump --all-databases -u root -p"$MYSQL_ROOT_PASSWORD" > "$BACKUP_DIR/{{.Name}}_dump.sql"
+  {{end}}
 {{end}}
 {{end}}
 {{end}}

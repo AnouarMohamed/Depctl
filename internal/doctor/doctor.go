@@ -31,6 +31,18 @@ func Check() {
 		output.Success("- Docker permissions are OK.")
 	}
 
+	output.Step("Checking Docker Swarm status...")
+	if out, err := exec.Command("docker", "info", "--format", "{{.Swarm.LocalNodeState}}").Output(); err == nil {
+		state := strings.TrimSpace(string(out))
+		if state == "active" {
+			output.Success("- Docker Swarm is active.")
+		} else {
+			output.Warning("- Docker Swarm is inactive. (Initialize it with 'docker swarm init' for Swarm presets).")
+		}
+	} else {
+		output.Warning("- Could not check Swarm status.")
+	}
+
 	output.Step("Checking port 80 (HTTP)...")
 	if isPortOpen("80") {
 		output.Warning("- Port 80 is already in use. This may conflict with Traefik.")

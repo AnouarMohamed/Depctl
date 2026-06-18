@@ -68,8 +68,16 @@ func (vpsProvider) Apply(plan *types.Plan, opts ApplyOptions) error {
 			if err := createNetwork(action.Name, opts.DryRun); err != nil {
 				return err
 			}
+		case "create_swarm_network":
+			if err := createSwarmNetwork(action.Name, opts.DryRun); err != nil {
+				return err
+			}
 		case "compose_up":
 			if err := composeUp(plan, action.File, opts); err != nil {
+				return err
+			}
+		case "swarm_deploy":
+			if err := swarmDeploy(plan, action.File, opts); err != nil {
 				return err
 			}
 		default:
@@ -82,6 +90,10 @@ func (vpsProvider) Apply(plan *types.Plan, opts ApplyOptions) error {
 }
 
 func (vpsProvider) Status(plan *types.Plan, opts StatusOptions) error {
+	if plan.Preset == "swarm-traefik" {
+		_, err := runCommand(commandSpec{Name: "docker", Args: []string{"stack", "services", plan.Project.Name}, Cwd: rootDir(plan)}, false)
+		return err
+	}
 	composePath := filepath.Join(outputDir(plan, opts.OutputDir), "docker-compose.yml")
 	if _, err := os.Stat(composePath); err != nil {
 		return fmt.Errorf("compose file missing: %s", composePath)
@@ -91,6 +103,20 @@ func (vpsProvider) Status(plan *types.Plan, opts StatusOptions) error {
 }
 
 func (vpsProvider) Logs(plan *types.Plan, opts LogsOptions) error {
+	if plan.Preset == "swarm-traefik" {
+		serviceName := opts.Service
+		if serviceName == "" {
+			serviceName = plan.PublicService
+		}
+		fullServiceName := fmt.Sprintf("%s_%s", plan.Project.Name, serviceName)
+		args := []string{"service", "logs"}
+		if opts.Tail > 0 {
+			args = append(args, "--tail", fmt.Sprintf("%d", opts.Tail))
+		}
+		args = append(args, fullServiceName)
+		_, err := runCommand(commandSpec{Name: "docker", Args: args, Cwd: rootDir(plan)}, false)
+		return err
+	}
 	composePath := filepath.Join(outputDir(plan, opts.OutputDir), "docker-compose.yml")
 	args := []string{"compose", "-f", composePath, "logs"}
 	if opts.Tail > 0 {
@@ -207,4 +233,52 @@ func copyFile(src, dst string) error {
 		return err
 	}
 	return os.WriteFile(dst, data, 0644)
+}
+
+func createSwarmNetwork(name string, dryRun bool) error {
+	if dryRun {
+		output.Info("[DRY RUN] Would create Swarm overlay network: %s", name)
+		return nil
+	}
+	if name == "" {
+		return nil
+	}
+
+	output.Step("Ensuring Swarm overlay network exists: %s", name)
+	if err := exec.Command("docker", "network", "inspect", name).Run(); err == nil {
+		output.Info("Network %s already exists.", name)
+		return nil
+	}
+	_, err := runCommand(commandSpec{Name: "docker", Args: []string{"network", "create", "--driver", "overlay", "--attachable", name}}, false)
+	return err
+}
+
+func swarmDeploy(plan *types.Plan, file string, opts ApplyOptions) error {
+	if file == "" {
+		file = filepath.Join(outputDir(plan, opts.OutputDir), "docker-compose.yml")
+	}
+	if file == filepath.Join(".deploy", "docker-compose.yml") {
+		file = filepath.Join(outputDir(plan, opts.OutputDir), "docker-compose.yml")
+	}
+
+	if !opts.DryRun {
+		out, err := exec.Command("docker", "info", "--format", "{{.Swarm.LocalNodeState}}").Output()
+		if err != nil || strings.TrimSpace(string(out)) != "active" {
+			return fmt.Errorf("Docker Swarm is not initialized on this machine. Run 'docker swarm init' first")
+		}
+	}
+
+	// 1. Build image locally since Swarm doesn't build images
+	if !opts.SkipBuild {
+		output.Step("Building image locally for Swarm...")
+		_, err := runCommand(commandSpec{Name: "docker", Args: []string{"compose", "-f", file, "build"}, Cwd: rootDir(plan)}, opts.DryRun)
+		if err != nil {
+			return err
+		}
+	}
+
+	// 2. Deploy stack
+	output.Step("Deploying Docker Swarm stack: %s...", plan.Project.Name)
+	_, err := runCommand(commandSpec{Name: "docker", Args: []string{"stack", "deploy", "-c", file, plan.Project.Name}, Cwd: rootDir(plan)}, opts.DryRun)
+	return err
 }

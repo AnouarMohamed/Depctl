@@ -181,7 +181,7 @@ func basePlan(det *types.Detection, preset, domain, ci string) (*types.Plan, err
 		generatedFiles = append(generatedFiles, ".deploy/Dockerfile", ".deploy/.dockerignore")
 	}
 
-	if preset == "compose-traefik" {
+	if preset == "compose-traefik" || preset == "swarm-traefik" {
 		generatedFiles = append(generatedFiles, ".deploy/traefik/dynamic.yml")
 	} else if preset == "compose-nginx" {
 		generatedFiles = append(generatedFiles, ".deploy/nginx/default.conf")
@@ -198,12 +198,24 @@ func basePlan(det *types.Detection, preset, domain, ci string) (*types.Plan, err
 			Type: "create_network",
 			Name: "web",
 		})
+	} else if preset == "swarm-traefik" {
+		actions = append(actions, types.Action{
+			Type: "create_swarm_network",
+			Name: "web",
+		})
 	}
 
-	actions = append(actions, types.Action{
-		Type: "compose_up",
-		File: filepath.Join(".deploy", "docker-compose.yml"),
-	})
+	if preset == "swarm-traefik" {
+		actions = append(actions, types.Action{
+			Type: "swarm_deploy",
+			File: filepath.Join(".deploy", "docker-compose.yml"),
+		})
+	} else {
+		actions = append(actions, types.Action{
+			Type: "compose_up",
+			File: filepath.Join(".deploy", "docker-compose.yml"),
+		})
+	}
 
 	// 6. Gather warnings
 	warnings := make([]string, len(det.Warnings))
@@ -282,7 +294,7 @@ func generatedFilesFor(plan *types.Plan) []string {
 		if !hasArtifact(plan, "Dockerfile") {
 			files = append(files, ".deploy/Dockerfile", ".deploy/.dockerignore")
 		}
-		if plan.Preset == "compose-traefik" {
+		if plan.Preset == "compose-traefik" || plan.Preset == "swarm-traefik" {
 			files = append(files, ".deploy/traefik/dynamic.yml")
 		} else if plan.Preset == "compose-nginx" {
 			files = append(files, ".deploy/nginx/default.conf")
@@ -409,8 +421,16 @@ func actionsFor(plan *types.Plan) []types.Action {
 		actions := []types.Action{}
 		if plan.Preset == "compose-traefik" {
 			actions = append(actions, types.Action{Type: "create_network", Name: "web"})
+		} else if plan.Preset == "swarm-traefik" {
+			actions = append(actions, types.Action{Type: "create_swarm_network", Name: "web"})
 		}
-		return append(actions, types.Action{Type: "compose_up", File: filepath.Join(".deploy", "docker-compose.yml")})
+
+		if plan.Preset == "swarm-traefik" {
+			actions = append(actions, types.Action{Type: "swarm_deploy", File: filepath.Join(".deploy", "docker-compose.yml")})
+		} else {
+			actions = append(actions, types.Action{Type: "compose_up", File: filepath.Join(".deploy", "docker-compose.yml")})
+		}
+		return actions
 	}
 }
 

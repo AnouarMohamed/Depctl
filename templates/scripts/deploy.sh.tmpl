@@ -19,15 +19,27 @@ fi
 
 # 2. Pull/Build
 echo "📦 Building images..."
+{{if eq .Preset "swarm-traefik"}}
+docker compose -f .deploy/docker-compose.yml build
+{{else}}
 docker compose -f .deploy/docker-compose.yml build --pull
+{{end}}
 
 # 3. Up
 echo "🆙 Starting containers..."
+{{if eq .Preset "swarm-traefik"}}
+docker stack deploy -c .deploy/docker-compose.yml {{.Project.Name}}
+{{else}}
 docker compose -f .deploy/docker-compose.yml up -d
+{{end}}
 
 # 4. Healthcheck
 echo "🏥 Checking health..."
 # Simple check for now
+{{if eq .Preset "swarm-traefik"}}
+docker stack services {{.Project.Name}}
+{{else}}
 docker compose -f .deploy/docker-compose.yml ps
+{{end}}
 
 echo "✅ Deployment complete!"

@@ -12,6 +12,10 @@ echo "⏪ Rolling back deployment for {{.Domain}}..."
 # or just re-run compose up.
 # Real rollback would involve switching to a backup folder.
 
+{{if eq .Preset "swarm-traefik"}}
+docker stack deploy -c .deploy/docker-compose.yml {{.Project.Name}}
+{{else}}
 docker compose -f .deploy/docker-compose.yml up -d
+{{end}}
 
 echo "✅ Rollback attempted."

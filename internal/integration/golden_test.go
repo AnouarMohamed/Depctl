@@ -17,7 +17,7 @@ func TestGoldenFlows(t *testing.T) {
 		t.Fatalf("failed to read fixtures dir: %v", err)
 	}
 
-	presets := []string{"compose-traefik", "compose-nginx"}
+	presets := []string{"compose-traefik", "compose-nginx", "swarm-traefik"}
 
 	for _, fixture := range fixtures {
 		if !fixture.IsDir() {
@@ -63,7 +63,7 @@ func TestGoldenFlows(t *testing.T) {
 					}
 				}
 
-				if preset == "compose-traefik" {
+				if preset == "compose-traefik" || preset == "swarm-traefik" {
 					if _, err := os.Stat(filepath.Join(tempOutputDir, "traefik", "dynamic.yml")); os.IsNotExist(err) {
 						t.Errorf("traefik/dynamic.yml missing")
 					}

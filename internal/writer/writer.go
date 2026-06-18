@@ -129,6 +129,8 @@ func templateMap(plan *types.Plan) map[string]string {
 		fileTemplateMap["docker-compose.yml"] = "compose/docker-compose.yml.tmpl"
 	case "compose-nginx":
 		fileTemplateMap["docker-compose.yml"] = "compose/nginx/docker-compose.yml.tmpl"
+	case "swarm-traefik":
+		fileTemplateMap["docker-compose.yml"] = "compose/swarm/docker-compose.yml.tmpl"
 	default:
 		fileTemplateMap["docker-compose.yml"] = "compose/docker-compose.yml.tmpl"
 	}
