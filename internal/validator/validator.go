@@ -1,12 +1,13 @@
 package validator
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
+	"github.com/AnouarMohamed/Depctl/internal/planfile"
 	"github.com/AnouarMohamed/Depctl/internal/types"
 	"gopkg.in/yaml.v3"
 )
@@ -23,23 +24,15 @@ func Validate(outputDir string) (*Result, error) {
 	res := &Result{Valid: true}
 
 	// 1. Check if plan.json exists and parses cleanly
-	planPath := filepath.Join(outputDir, "plan.json")
-	planBytes, err := os.ReadFile(planPath)
+	plan, err := planfile.Load(outputDir)
 	if err != nil {
-		res.Errors = append(res.Errors, fmt.Sprintf("plan.json missing: %v", err))
+		res.Errors = append(res.Errors, err.Error())
 		res.Valid = false
 		return res, nil // Critical error, stop here
 	}
 
-	var plan types.Plan
-	if err := json.Unmarshal(planBytes, &plan); err != nil {
-		res.Errors = append(res.Errors, fmt.Sprintf("failed to parse plan.json: %v", err))
-		res.Valid = false
-		return res, nil // Critical error
-	}
-
 	// 2. Domain check
-	if plan.Domain == "" {
+	if plan.Target.Kind == "vps" && plan.Domain == "" {
 		res.Errors = append(res.Errors, "domain is empty in plan.json")
 		res.Valid = false
 	}
@@ -55,7 +48,7 @@ func Validate(outputDir string) (*Result, error) {
 		if len(relPath) > 8 && relPath[:8] == ".deploy/" {
 			cleanPath = relPath[8:]
 		}
-		
+
 		absPath := filepath.Join(outputDir, cleanPath)
 		if _, err := os.Stat(absPath); err != nil {
 			res.Errors = append(res.Errors, fmt.Sprintf("required file missing: %s", relPath))
@@ -63,18 +56,23 @@ func Validate(outputDir string) (*Result, error) {
 		}
 	}
 
+	validateRootArtifacts(plan, res)
+
 	// 5. Compose file validation
 	composePath := filepath.Join(outputDir, "docker-compose.yml")
-	if _, err := os.Stat(composePath); err == nil {
-		if err := validateCompose(composePath, &plan, res); err != nil {
-			return nil, err
+	if plan.Target.Kind == "vps" {
+		if _, err := os.Stat(composePath); err == nil {
+			if err := validateCompose(composePath, plan, res); err != nil {
+				return nil, err
+			}
+			validateComposeCLI(composePath, plan, res)
 		}
 	}
 
 	// 6. .env.example validation
 	envExPath := filepath.Join(outputDir, ".env.example")
 	if _, err := os.Stat(envExPath); err == nil {
-		validateEnvExample(envExPath, &plan, res)
+		validateEnvExample(envExPath, plan, res)
 	}
 
 	// 7. Check for unresolved placeholders {{ }}
@@ -83,6 +81,25 @@ func Validate(outputDir string) (*Result, error) {
 	}
 
 	return res, nil
+}
+
+func validateRootArtifacts(plan *types.Plan, res *Result) {
+	root := plan.Target.Root
+	if root == "" {
+		root = plan.Project.Root
+	}
+	if root == "" {
+		root = "."
+	}
+	for _, artifact := range plan.Artifacts {
+		if artifact.Scope != "root" {
+			continue
+		}
+		if _, err := os.Stat(filepath.Join(root, artifact.Path)); err != nil {
+			res.Errors = append(res.Errors, fmt.Sprintf("required root artifact missing: %s", artifact.Path))
+			res.Valid = false
+		}
+	}
 }
 
 func validateCompose(path string, plan *types.Plan, res *Result) error {
@@ -126,6 +143,29 @@ func validateCompose(path string, plan *types.Plan, res *Result) error {
 	}
 
 	return nil
+}
+
+func validateComposeCLI(path string, plan *types.Plan, res *Result) {
+	if _, err := exec.LookPath("docker"); err != nil {
+		res.Warnings = append(res.Warnings, "docker is not installed or not in PATH; skipped docker compose config")
+		return
+	}
+
+	envPath := filepath.Join(plan.Target.Root, plan.Target.EnvFile)
+	if plan.Target.EnvFile == "" {
+		envPath = filepath.Join(plan.Target.Root, ".env")
+	}
+	if _, err := os.Stat(envPath); err != nil {
+		res.Warnings = append(res.Warnings, fmt.Sprintf("%s missing; skipped docker compose config until env values exist", envPath))
+		return
+	}
+
+	cmd := exec.Command("docker", "compose", "-f", path, "config")
+	cmd.Dir = plan.Target.Root
+	if out, err := cmd.CombinedOutput(); err != nil {
+		res.Errors = append(res.Errors, fmt.Sprintf("docker compose config failed: %s", strings.TrimSpace(string(out))))
+		res.Valid = false
+	}
 }
 
 func validateEnvExample(path string, plan *types.Plan, res *Result) {

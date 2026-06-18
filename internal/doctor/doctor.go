@@ -51,6 +51,32 @@ func Check() {
 	} else {
 		output.Success("- No conflicting Traefik containers found.")
 	}
+
+	output.Step("Checking Git installation...")
+	if err := checkCommand("git", "--version"); err != nil {
+		output.Warning("- Git is not installed or not in PATH.")
+	} else {
+		output.Success("- Git is installed.")
+	}
+
+	output.Step("Checking disk space...")
+	if out, err := exec.Command("df", "-h", ".").CombinedOutput(); err != nil {
+		output.Warning("- Could not check disk space: %v", err)
+	} else {
+		output.Info(strings.TrimSpace(string(out)))
+	}
+
+	output.Step("Checking provider CLIs...")
+	if err := checkCommand("vercel", "--version"); err != nil {
+		output.Warning("- Vercel CLI is not installed. Install it before using --target vercel.")
+	} else {
+		output.Success("- Vercel CLI is installed.")
+	}
+	if err := checkCommand("fly", "version"); err != nil {
+		output.Warning("- flyctl is not installed. Install it before using --target fly.")
+	} else {
+		output.Success("- flyctl is installed.")
+	}
 }
 
 func checkCommand(name string, args ...string) error {

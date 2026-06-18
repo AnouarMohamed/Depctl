@@ -5,10 +5,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/cobra"
 	"github.com/AnouarMohamed/Depctl/internal/output"
+	"github.com/AnouarMohamed/Depctl/internal/planfile"
 	"github.com/AnouarMohamed/Depctl/internal/planner"
+	"github.com/AnouarMohamed/Depctl/internal/target"
 	"github.com/AnouarMohamed/Depctl/internal/types"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -16,6 +18,10 @@ var (
 	planDomain    string
 	planCI        string
 	planOutputDir string
+	planTarget    string
+	planEnvFile   string
+	planRegion    string
+	planAppName   string
 )
 
 var planCmd = &cobra.Command{
@@ -44,8 +50,23 @@ var planCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		provider, err := target.Get(planTarget)
+		if err != nil {
+			output.Error("planning failed: %v", err)
+			os.Exit(1)
+		}
+
 		// Compile plan
-		plan, err := planner.Plan(&det, planPreset, planDomain, planCI)
+		plan, err := provider.Plan(&det, target.PlanOptions{
+			Preset:    planPreset,
+			Domain:    planDomain,
+			CI:        planCI,
+			Target:    planTarget,
+			OutputDir: planOutputDir,
+			AppName:   planAppName,
+			Region:    planRegion,
+			EnvFile:   planEnvFile,
+		})
 		if err != nil {
 			output.Error("planning failed: %v", err)
 			os.Exit(1)
@@ -58,15 +79,8 @@ var planCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// Write plan.json
-		planBytes, err := json.MarshalIndent(plan, "", "  ")
-		if err != nil {
-			output.Error("failed to serialize plan data: %v", err)
-			os.Exit(1)
-		}
-
 		planPath := filepath.Join(planOutputDir, "plan.json")
-		if err := os.WriteFile(planPath, planBytes, 0644); err != nil {
+		if err := planfile.Save(plan, planOutputDir); err != nil {
 			output.Error("failed to write %s: %v", planPath, err)
 			os.Exit(1)
 		}
@@ -81,7 +95,7 @@ var planCmd = &cobra.Command{
 		}
 		output.Success("Wrote plan report: %s", reportPath)
 
-		output.Success("Plan generated successfully for preset '%s' and domain '%s'.", plan.Preset, plan.Domain)
+		output.Success("Plan generated successfully for target '%s'.", plan.Target.Kind)
 	},
 }
 
@@ -90,7 +104,10 @@ func init() {
 	planCmd.Flags().StringVar(&planDomain, "domain", "", "target domain name for deployment")
 	planCmd.Flags().StringVar(&planCI, "ci", "", "CI provider template (e.g. github, none)")
 	planCmd.Flags().StringVar(&planOutputDir, "output-dir", ".deploy", "directory where deployment plan is saved")
+	planCmd.Flags().StringVar(&planTarget, "target", "vps", "deployment target (vps, vercel, fly)")
+	planCmd.Flags().StringVar(&planEnvFile, "env-file", ".env", "environment file to import during provider deploy")
+	planCmd.Flags().StringVar(&planRegion, "region", "iad", "provider region for targets that need one")
+	planCmd.Flags().StringVar(&planAppName, "app-name", "", "provider app/project name")
 
 	rootCmd.AddCommand(planCmd)
 }
-

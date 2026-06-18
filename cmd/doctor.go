@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/AnouarMohamed/Depctl/internal/doctor"
+	"github.com/spf13/cobra"
 )
 
 var doctorCmd = &cobra.Command{

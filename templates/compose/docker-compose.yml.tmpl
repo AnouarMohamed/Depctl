@@ -7,7 +7,7 @@ services:
   {{.Name}}:
     {{if eq .Type "app"}}
     build:
-      context: {{.Build}}
+      context: ..
       dockerfile: Dockerfile
     restart: unless-stopped
     {{if eq $.Preset "compose-traefik"}}
@@ -21,7 +21,13 @@ services:
       - app_net
     {{end}}
     env_file:
-      - .env
+      - ../.env
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:{{.InternalPort}}/ || curl -fsS http://127.0.0.1:{{.InternalPort}}/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     {{if eq $.Preset "compose-traefik"}}
     labels:
       - "traefik.enable=true"
@@ -36,7 +42,7 @@ services:
     networks:
       - app_net
     env_file:
-      - .env
+      - ../.env
     {{if .Volume}}
     {{if eq .Name "postgres"}}
     volumes:

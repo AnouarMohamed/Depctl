@@ -4,9 +4,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/cobra"
 	"github.com/AnouarMohamed/Depctl/internal/output"
+	"github.com/AnouarMohamed/Depctl/internal/planfile"
+	"github.com/AnouarMohamed/Depctl/internal/target"
 	"github.com/AnouarMohamed/Depctl/internal/validator"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -20,7 +22,17 @@ var validateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		output.Step("Validating deployment kit in %s...", validateOutputDir)
 
-		res, err := validator.Validate(validateOutputDir)
+		plan, err := planfile.Load(validateOutputDir)
+		if err != nil {
+			output.Error("Validation failed: %v", err)
+			os.Exit(1)
+		}
+		provider, err := target.Get(plan.Target.Kind)
+		if err != nil {
+			output.Error("Validation failed: %v", err)
+			os.Exit(1)
+		}
+		res, err := provider.Validate(plan, target.ValidateOptions{OutputDir: validateOutputDir})
 		if err != nil {
 			output.Error("Validation failed: %v", err)
 			os.Exit(1)
