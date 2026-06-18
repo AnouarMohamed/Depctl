@@ -26,12 +26,19 @@ Depctl releases are tag-driven.
 
 3. Commit the release notes.
 
-4. Create and push the tag.
+4. Create and push the tag with the guarded release script.
 
    ```bash
-   git tag -a vX.Y.Z -m "Depctl vX.Y.Z"
-   git push origin vX.Y.Z
+   make release VERSION=vX.Y.Z
    ```
+
+   The script refuses to tag unless:
+
+   - the current branch is `main`;
+   - the worktree is clean;
+   - `docs/releases/vX.Y.Z.md` exists;
+   - the tag does not already exist;
+   - `make verify` passes.
 
 5. GitHub Actions will publish:
 

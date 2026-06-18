@@ -3,7 +3,7 @@ SHELL := /usr/bin/env bash
 BINARY ?= depctl
 BUILD_DIR ?= dist
 
-.PHONY: help fmt fmt-check vet test race build smoke verify clean
+.PHONY: help fmt fmt-check vet test race build smoke verify release clean
 
 help:
 	@printf '%s\n' \
@@ -16,6 +16,7 @@ help:
 		'  build      Build the CLI into dist/' \
 		'  smoke      Run CLI smoke tests against fixtures' \
 		'  verify     Run the full local quality gate' \
+		'  release    Create a guarded release tag, VERSION=vX.Y.Z' \
 		'  clean      Remove build output'
 
 fmt:
@@ -41,6 +42,10 @@ smoke:
 	bash scripts/smoke.sh
 
 verify: fmt-check vet test race build smoke
+
+release:
+	@test -n "$(VERSION)" || (echo 'VERSION is required, for example: make release VERSION=v1.1.0' >&2; exit 2)
+	bash scripts/release.sh "$(VERSION)"
 
 clean:
 	rm -rf "$(BUILD_DIR)"
