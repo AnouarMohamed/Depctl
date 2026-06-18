@@ -5,5 +5,13 @@
  /_____/\___/ .___/\__/\___/\__/
             /_/
 
- deployment control for real apps
- scan -> plan -> write -> validate -> deploy
+ by Anouar Mohamed
+
+ START
+   depctl setup --domain app.example.com
+   depctl deploy --target fly --domain app.io
+   depctl deploy --target vercel
+
+ CHECK
+   depctl doctor
+   depctl --help
