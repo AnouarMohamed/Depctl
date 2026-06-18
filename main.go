@@ -1,7 +1,15 @@
 package main
 
-import "github.com/AnouarMohamed/Depctl/cmd"
+import (
+	_ "embed"
+
+	"github.com/AnouarMohamed/Depctl/cmd"
+)
+
+//go:embed HHHQ
+var banner string
 
 func main() {
+	cmd.SetBanner(banner)
 	cmd.Execute()
 }

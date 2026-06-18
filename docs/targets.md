@@ -21,7 +21,9 @@ Writes Docker/Compose files, root `Dockerfile`, `.dockerignore`, scripts, report
 
 ## Fly.io
 
-Requires `flyctl` and either `fly auth login` or `FLY_ACCESS_TOKEN`.
+Requires `flyctl`.
+
+For local interactive use, Depctl checks `fly auth whoami` and starts `fly auth login` when you are not logged in. Use `FLY_ACCESS_TOKEN` only for CI or non-interactive deploys.
 
 ```bash
 depctl deploy --target fly --domain api.example.com
@@ -31,7 +33,9 @@ Writes root `Dockerfile`, `.dockerignore`, `fly.toml`, imports `.env` with `fly 
 
 ## Vercel
 
-Requires Vercel CLI and either `vercel login` or `VERCEL_TOKEN`.
+Requires Vercel CLI.
+
+For local interactive use, Depctl checks `vercel whoami` and starts `vercel login` when you are not logged in. Use `VERCEL_TOKEN` only for CI or non-interactive deploys.
 
 ```bash
 depctl deploy --target vercel
@@ -42,6 +46,8 @@ Best for Next.js and Vite/static apps. Writes root `vercel.json`, imports `.env`
 ## Secrets
 
 Secret values are read from `--env-file` during provider deploy. Values are not stored in `plan.json`, reports, or normal command output.
+
+Provider access tokens are not required for normal local usage. Prefer the provider CLI login flow locally; use tokens only when the command cannot prompt, such as CI.
 
 Default:
 

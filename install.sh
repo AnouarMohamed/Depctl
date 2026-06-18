@@ -7,6 +7,12 @@ mkdir -p "$BIN_DIR"
 echo "Building depctl..."
 go build -o "$BIN_DIR/depctl" .
 
+if [ -t 1 ] && [ -s HHHQ ]; then
+  printf '\n'
+  cat HHHQ
+  printf '\n\n'
+fi
+
 case ":$PATH:" in
   *":$BIN_DIR:"*) ;;
   *)

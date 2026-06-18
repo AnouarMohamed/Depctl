@@ -136,6 +136,7 @@ type commandSpec struct {
 	RedactValues []string
 	AllowFailure bool
 	Capture      bool
+	Interactive  bool
 }
 
 func runCommand(spec commandSpec, dryRun bool) (string, error) {
@@ -150,6 +151,21 @@ func runCommand(spec commandSpec, dryRun bool) (string, error) {
 	cmd.Dir = spec.Cwd
 	if spec.Stdin != "" {
 		cmd.Stdin = strings.NewReader(spec.Stdin)
+	}
+
+	if spec.Interactive {
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err := cmd.Run()
+		if err != nil && !spec.AllowFailure {
+			return "", fmt.Errorf("%s failed: %w", cmdLine, err)
+		}
+		if err != nil {
+			output.Warning("Ignoring non-blocking command failure: %s", cmdLine)
+			return "", err
+		}
+		return "", nil
 	}
 
 	var stdout bytes.Buffer
@@ -172,6 +188,15 @@ func runCommand(spec commandSpec, dryRun bool) (string, error) {
 		return combined, err
 	}
 	return combined, nil
+}
+
+func hasInteractiveTerminal() bool {
+	stdin, stdinErr := os.Stdin.Stat()
+	stdout, stdoutErr := os.Stdout.Stat()
+	if stdinErr != nil || stdoutErr != nil {
+		return false
+	}
+	return (stdin.Mode()&os.ModeCharDevice) != 0 && (stdout.Mode()&os.ModeCharDevice) != 0
 }
 
 func rootDir(plan *types.Plan) string {
