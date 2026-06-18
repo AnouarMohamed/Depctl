@@ -15,5 +15,5 @@
 # vendor/
 
 # Project specific
-depctl
+/depctl
 .deploy/

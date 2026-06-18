@@ -15,7 +15,19 @@ For day-to-day use, you usually run one short command.
 From Go:
 
 ```bash
-go install github.com/AnouarMohamed/Depctl@latest
+go install github.com/AnouarMohamed/Depctl/cmd/depctl@latest
+```
+
+If your shell cannot find `depctl` after install, add Go's bin directory to your `PATH`:
+
+```bash
+export PATH="$(go env GOPATH)/bin:$PATH"
+```
+
+Then verify:
+
+```bash
+depctl --help
 ```
 
 From a cloned repo:

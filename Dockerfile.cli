@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the binary
-RUN CGO_ENABLED=0 GOOS=linux go build -o /depctl .
+RUN CGO_ENABLED=0 GOOS=linux go build -o /depctl ./cmd/depctl
 
 # Use a minimal alpine image for the final runner
 FROM alpine:3.19

@@ -5,7 +5,7 @@ BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
 mkdir -p "$BIN_DIR"
 
 echo "Building depctl..."
-go build -o "$BIN_DIR/depctl" .
+go build -o "$BIN_DIR/depctl" ./cmd/depctl
 
 if [ -t 1 ] && [ -s HHHQ ]; then
   printf '\n'
