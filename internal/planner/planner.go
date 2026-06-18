@@ -249,6 +249,7 @@ func generatedFilesFor(plan *types.Plan) []string {
 	switch plan.Target.Kind {
 	case "vercel":
 		files := []string{
+			".deploy/plan.json",
 			".deploy/.env.example",
 			".deploy/.gitignore",
 			".deploy/README.md",
@@ -260,6 +261,7 @@ func generatedFilesFor(plan *types.Plan) []string {
 		return files
 	case "fly":
 		return []string{
+			".deploy/plan.json",
 			".deploy/.env.example",
 			".deploy/.gitignore",
 			".deploy/README.md",
@@ -267,6 +269,7 @@ func generatedFilesFor(plan *types.Plan) []string {
 		}
 	default:
 		files := []string{
+			".deploy/plan.json",
 			".deploy/docker-compose.yml",
 			".deploy/.env.example",
 			".deploy/.gitignore",
